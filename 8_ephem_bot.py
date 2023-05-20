@@ -13,45 +13,58 @@
 
 """
 import logging
+from telegram import Update
+from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler
+import ephem
+from datetime import datetime
 
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+import settings
 
-logging.basicConfig(format='%(name)s - %(levelname)s - %(message)s',
-                    level=logging.INFO,
-                    filename='bot.log')
+logging.basicConfig(filename='bot.log', level=logging.INFO)
 
-
-PROXY = {
-    'proxy_url': 'socks5://t1.learn.python.ru:1080',
-    'urllib3_proxy_kwargs': {
-        'username': 'learn',
-        'password': 'python'
-    }
+planets_dict = {
+    'Sun': lambda d: ephem.Sun(d),
+    'Mercury': lambda d: ephem.Mercury(d),
+    'Venus': lambda d: ephem.Venus(d),
+    'Moon': lambda d: ephem.Moon(d),
+    'Mars': lambda d: ephem.Mars(d),
+    'Jupiter': lambda d: ephem.Jupiter(d),
+    'Saturn': lambda d: ephem.Saturn(d),
+    'Uranus': lambda d: ephem.Uranus(d),
+    'Neptune': lambda d: ephem.Neptune(d),
+    'Pluto': lambda d: ephem.Pluto(d),
 }
 
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    print('Вызван /start')
+    await update.message.reply_text('Привет, пользователь! Ты вызвал команду /start')
 
-def greet_user(update, context):
-    text = 'Вызван /start'
-    print(text)
-    update.message.reply_text(text)
+async def handle_planet(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    parts = update.message.text.split()
+    if len(parts) < 2:
+      await update.message.reply_text('Не задана планета. Попробуйте: /planet Mars')
+      return    
+    planet_name = parts[1].strip()
+    if not planet_name in planets_dict:
+        await update.message.reply_text(f'Планета не найдена или не поддерживается. Поддерживаемые планеты: {[k for k in planets_dict.keys()]}')
+        return
 
-
-def talk_to_me(update, context):
-    user_text = update.message.text
-    print(user_text)
-    update.message.reply_text(text)
-
+    today = datetime.today().strftime('%Y/%m/%d')
+    planet = planets_dict[planet_name](today)
+    constellation = ephem.constellation(planet)
+    await update.message.reply_text(f'Planet {parts[1]} is in constellation: {constellation}')
 
 def main():
-    mybot = Updater("КЛЮЧ, КОТОРЫЙ НАМ ВЫДАЛ BotFather", request_kwargs=PROXY, use_context=True)
+    application = ApplicationBuilder().token(settings.API_KEY).build()
 
-    dp = mybot.dispatcher
-    dp.add_handler(CommandHandler("start", greet_user))
-    dp.add_handler(MessageHandler(Filters.text, talk_to_me))
+    start_handler = CommandHandler("start", start)
+    application.add_handler(start_handler)
 
-    mybot.start_polling()
-    mybot.idle()
+    planet_handler = CommandHandler("planet", handle_planet)
+    application.add_handler(planet_handler)
 
+    logging.info("Bot started")
+    application.run_polling()
 
 if __name__ == "__main__":
     main()
