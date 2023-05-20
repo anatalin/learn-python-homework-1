@@ -15,12 +15,27 @@
 
 """
 
+# из задания не совсем понятно, что делать, если первая строка короче второй
+# или если первая длиннее, а вторая 'learn' - возвращать 2 или 3 ?
+# поэтому закодил всё прямолинейно по ТЗ)
+def compare_strings(str1, str2):
+    if (not isinstance(str1, str)) or (not isinstance(str2, str)):
+        return 0
+    if str1 == str2:
+        return 1
+    if len(str1) > len(str2):
+        return 2
+    if str2 == 'learn':
+        return 3
+    raise ValueError('Аргументы не подходят ни под одно из условий')
+
 def main():
-    """
-    Эта функция вызывается автоматически при запуске скрипта в консоли
-    В ней надо заменить pass на ваш код
-    """
-    pass
+    print(compare_strings('abc', 1))
+    print(compare_strings(1, 'abc'))
+    print(compare_strings('abc', 'abc'))
+    print(compare_strings('abc', 'a'))
+    print(compare_strings('abc', 'learn'))
+    print(compare_strings('abc', 'def'))
     
 if __name__ == "__main__":
     main()
