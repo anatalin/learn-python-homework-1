@@ -15,13 +15,21 @@
     
 """
 
-questions_and_answers = {}
-
-def ask_user(answers_dict):
-    """
-    Замените pass на ваш код
-    """
-    pass
+def ask_user(questions_and_answers):
+    while True:
+        question = input('Введите ваш вопрос: ')
+        question = question.lower().strip().replace('?', '').replace('!', '').replace('.', '')
+        if question in questions_and_answers:
+            print(questions_and_answers[question])
+        else:
+            print('Ответ не найден, повторите ещё раз')
+        
     
 if __name__ == "__main__":
+    questions_and_answers = {
+        'привет': 'Привет, пользователь!',
+        'как тебя зовут': 'Меня зовут Валли',
+        'как дела': 'Хорошо',
+        'какой твой любимый цвет': 'Синий'
+    }
     ask_user(questions_and_answers)

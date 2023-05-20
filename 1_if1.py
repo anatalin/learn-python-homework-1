@@ -13,13 +13,28 @@
 * Вывести содержимое переменной на экран
 
 """
+def check_age(age):
+    if 0 <= age < 6:
+       return 'Вы должны учиться в детском саду'
+    if 6 <= age < 18:
+       return 'Вы должны учиться в школе'
+    if 18 <= age < 25:
+       return 'Вы должны учиться в ВУЗе'
+    return 'Вы должны работать'
 
 def main():
-    """
-    Эта функция вызывается автоматически при запуске скрипта в консоли
-    В ней надо заменить pass на ваш код
-    """
-    pass
-
+    while True:
+        try:
+          user_input = input('Введите возраст: ')
+          age = int(user_input)
+          if age < 0 or age > 200:
+             print('Возраст не может быть меньше 0 или больше 200')
+             continue
+          
+          result = check_age(age)
+          print(result)
+          break
+        except (TypeError, ValueError):
+          print('Ошибка определения возраста: возраст должен быть числом')
 if __name__ == "__main__":
     main()
